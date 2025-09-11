@@ -39,7 +39,11 @@ for i in {1..8}; do
     ip netns exec ns1 ip mptcp endpoint add "10.10.$i.1" dev veth1-$i id $i signal
 
     ip netns exec ns2 ip mptcp limits set subflows 8 add_addr_accepted 8
-    ip netns exec ns2 ip mptcp endpoint add "10.10.$i.2" dev veth2-$i id $i subflow
+    # In some OS, when subflow and signal are both configured, the SYNC_SENT ssk are
+    # very quickly to occupy the number of subflow_max, and the speed is not correct.
+    # So here the subflow is not needed I think, but need more test, and read more code
+    # about mptcp in-kernel path manager.
+    #ip netns exec ns2 ip mptcp endpoint add "10.10.$i.2" dev veth2-$i id $i subflow
 done
 
 # 在ns1中启动iperf3服务器
